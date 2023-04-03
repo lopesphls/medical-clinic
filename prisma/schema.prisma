@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @unique
+  cpf       String   @unique
+  name      String
+  birthDate Int
+  email     String   @unique
+  password  String
+  image     String
+  doctor    Doctor?
+  patient   Patient?
+  clinicId  String?
+  Clinic    Clinic?  @relation(fields: [clinicId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user")
+}
+
+model Patient {
+  id            String         @id @unique
+  userId        String         @unique
+  medicalRecord MedicalRecord?
+  consultation  Consultation[]
+  user          User           @relation(fields: [userId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("patient")
+}
+
+model Doctor {
+  id           String            @id @unique
+  crm          String            @unique
+  userId       String            @unique
+  user         User              @relation(fields: [userId], references: [id])
+  clinicId     String
+  specialties  DoctorSpecialty[]
+  Consultation Consultation[]
+  clinic       Clinic            @relation(fields: [clinicId], references: [id])
+  updatedAt    DateTime          @updatedAt
+  createdAt    DateTime          @default(now())
+
+  @@map("doctor")
+}
+
+model Specialty {
+  id        String            @id @unique
+  name      String            @unique
+  doctors   DoctorSpecialty[]
+  clinicId  String
+  clinic    Clinic            @relation(fields: [clinicId], references: [id])
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@map("speciality")
+}
+
+model DoctorSpecialty {
+  id          String     @id @unique
+  doctor      Doctor?    @relation(fields: [doctorId], references: [id])
+  doctorId    String?
+  specialty   Specialty? @relation(fields: [specialtyId], references: [id])
+  specialtyId String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Consultation {
+  id              String        @id @unique
+  date            Int
+  value           Float
+  patientId       String
+  doctorId        String
+  medicalRecordId String
+  clinicId        String
+  patient         Patient       @relation(fields: [patientId], references: [id])
+  doctor          Doctor        @relation(fields: [doctorId], references: [id])
+  medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id])
+  clinic          Clinic        @relation(fields: [clinicId], references: [id])
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("consultation")
+}
+
+model MedicalRecord {
+  id           String         @id @unique
+  description  String
+  patientId    String         @unique
+  clinicId     String
+  Consultation Consultation[]
+  patient      Patient        @relation(fields: [patientId], references: [id])
+  clinic       Clinic         @relation(fields: [clinicId], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  @@map("medicalRecord")
+}
+
+model Clinic {
+  id            String          @id @unique
+  name          String
+  cpnj          String
+  email         String
+  cep           String
+  user          User[]
+  doctor        Doctor[]
+  specialties   Specialty[]
+  consultation  Consultation[]
+  medicaRecords MedicalRecord[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@map("clinic")
+}
