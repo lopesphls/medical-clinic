@@ -5,9 +5,28 @@ import { UserDomain } from '../../domain/user/entities/User.entity';
 @Injectable()
 export default class CreateUserRepository {
 	constructor(private prisma: PrismaClient) {}
-	public async Create(data: UserDomain) {
+	public async Create({
+		id,
+		image,
+		name,
+		birthDate,
+		cpf,
+		email,
+		password,
+	}: UserDomain) {
 		try {
-			return await this.prisma.user.create({ data: data });
+			const user = await this.prisma.user.create({
+				data: {
+					id,
+					birthDate: new Date(birthDate),
+					name,
+					cpf,
+					email,
+					password,
+					image,
+				},
+			});
+			return user;
 		} catch (error) {
 			return error;
 		}

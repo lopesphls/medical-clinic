@@ -1,8 +1,8 @@
 export interface CreateUserDto {
 	name: string;
-	birthDate: number;
+	birthDate: string;
 	email: string;
 	password: string;
-	image?: string;
+	image?: string | undefined;
 	cpf: string;
 }
