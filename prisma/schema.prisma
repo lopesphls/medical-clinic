@@ -14,10 +14,10 @@ model User {
   id        String   @id @unique
   cpf       String   @unique
   name      String
-  birthDate Int
+  birthDate DateTime
   email     String   @unique
   password  String
-  image     String
+  image     String?
   doctor    Doctor?
   patient   Patient?
   clinicId  String?
